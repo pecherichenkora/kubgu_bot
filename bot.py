@@ -826,7 +826,7 @@ async def handle_test(callback: CallbackQuery):
             parse_mode="Markdown"
         )
     elif callback.data == "test_correct7":
-    score += 1
+        score += 1
     await callback.message.answer_photo(
         photo="https://storage2.bothelp.io/pecherichenko/a2/a2f1/a2f1eb3120c4158fe8cb11bb44b99e07/IMG_5030.jpeg",
         caption=f"✅ Верно!\nИнтеграция — это сближение государств с передачей полномочий общим органам.\n\n"
