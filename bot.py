@@ -841,12 +841,12 @@ async def handle_test(callback: CallbackQuery):
             [InlineKeyboardButton(text="🎓 Прожить день магистранта", callback_data="start_day")]
         ])
     )
-        )
-    elif callback.data in ["test_wrong7a", "test_wrong7b"]:
+
+elif callback.data in ["test_wrong7a", "test_wrong7b"]:
     await callback.message.answer_photo(
         photo="https://storage2.bothelp.io/pecherichenko/a2/a2f1/a2f1eb3120c4158fe8cb11bb44b99e07/IMG_5030.jpeg",
-        caption=f"❌ Неверно.\n\nИнтеграция — это передача части суверенитета общим органам (как в ЕС).\n\n"
-                f"🎓 Тест пройден!\n\n"
+        caption=f"❌ Неверно.\nИнтеграция — это передача части суверенитета общим органам (как в ЕС).\n\n"
+                f"🎓 **Тест пройден!**\n\n"
                 f"Вы ответили правильно на {score} из 7 вопросов.\n\n"
                 "Магистратура КубГУ ждёт вас!\n\n⬇ Выберите действие:",
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
