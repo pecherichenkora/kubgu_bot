@@ -4,6 +4,9 @@ import logging
 from aiogram import Bot, Dispatcher, F
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.filters import Command
+from flask import Flask
+import threading
+import os
 
 TOKEN = "8843234890:AAGqFxhPN7ALZ9VephCAT_NXGtzkg-ROYBU"
 
@@ -1405,6 +1408,21 @@ async def back_to_protocol(callback: CallbackQuery):
         reply_markup=keyboard
     )
     await callback.answer()
+
+# ========== ВЕБ-СЕРВЕР ДЛЯ RENDER ==========
+app = Flask(__name__)
+
+@app.route('/')
+@app.route('/health')
+def health():
+    return "Bot is running", 200
+
+def run_web():
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
+
+# Запускаем веб-сервер в отдельном потоке
+threading.Thread(target=run_web, daemon=True).start()
 
 # ========== ЗАПУСК ==========
 async def main():
