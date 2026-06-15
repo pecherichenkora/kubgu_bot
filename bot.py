@@ -827,12 +827,9 @@ async def handle_test(callback: CallbackQuery):
         )
     elif callback.data == "test_correct7":
         score += 1
-    await callback.message.answer_photo(
+        await callback.message.answer_photo(
         photo="https://storage2.bothelp.io/pecherichenko/a2/a2f1/a2f1eb3120c4158fe8cb11bb44b99e07/IMG_5030.jpeg",
-        caption=f"✅ Верно!\nИнтеграция — это сближение государств с передачей полномочий общим органам.\n\n"
-                f"🎓 **Тест пройден!**\n\n"
-                f"Вы ответили правильно на {score} из 7 вопросов.\n\n"
-                "Магистратура КубГУ ждёт вас!\n\n⬇ Выберите действие:",
+        caption=f"✅ Верно!\nИнтеграция — это сближение государств с передачей полномочий общим органам.\n\n🎓 Тест пройден!\n\nВы ответили правильно на {score} из 7 вопросов.\n\nМагистратура КубГУ ждёт вас!\n\n⬇ Выберите действие:",
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="💼 Основная информация о программе", callback_data="info_placeholder")],
             [InlineKeyboardButton(text="👨‍🏫 Задать вопрос о поступлении", callback_data="contacts_placeholder")],
@@ -842,13 +839,10 @@ async def handle_test(callback: CallbackQuery):
         ])
     )
 
-elif callback.data in ["test_wrong7a", "test_wrong7b"]:
-    await callback.message.answer_photo(
+    elif callback.data in ["test_wrong7a", "test_wrong7b"]:
+         await callback.message.answer_photo(
         photo="https://storage2.bothelp.io/pecherichenko/a2/a2f1/a2f1eb3120c4158fe8cb11bb44b99e07/IMG_5030.jpeg",
-        caption=f"❌ Неверно.\nИнтеграция — это передача части суверенитета общим органам (как в ЕС).\n\n"
-                f"🎓 **Тест пройден!**\n\n"
-                f"Вы ответили правильно на {score} из 7 вопросов.\n\n"
-                "Магистратура КубГУ ждёт вас!\n\n⬇ Выберите действие:",
+        caption=f"❌ Неверно.\nИнтеграция — это передача части суверенитета общим органам (как в ЕС).\n\n🎓 Тест пройден!\n\nВы ответили правильно на {score} из 7 вопросов.\n\nМагистратура КубГУ ждёт вас!\n\n⬇ Выберите действие:",
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="💼 Основная информация о программе", callback_data="info_placeholder")],
             [InlineKeyboardButton(text="👨‍🏫 Задать вопрос о поступлении", callback_data="contacts_placeholder")],
