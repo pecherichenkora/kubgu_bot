@@ -41,7 +41,7 @@ async def collect_name(callback: CallbackQuery):
         [InlineKeyboardButton(text="🛡 Будущий атташе", callback_data="name_atashe")],
         [InlineKeyboardButton(text="📊 Будущий аналитик", callback_data="name_analyst")],
         [InlineKeyboardButton(text="🎙 Будущий пресс-секретарь", callback_data="name_press")],
-        [InlineKeyboardButton(text="🌍 Будущий регионовед", callback_data="name_strategy")]
+        [InlineKeyboardButton(text="🕵️ Будущий разведчик", callback_data="name_strategy")]
     ])
     await callback.message.answer(
         "Для идентификации в Системе выберите свой позывной и специализацию.\n\n"
@@ -709,7 +709,7 @@ async def start_test(callback: CallbackQuery):
         "Что из перечисленного является примером «мягкой силы» (soft power) в международных отношениях?\n\n"
         "⬇ Выберите вариант ответа.",
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="А) Военное присутствие в регионе", callback_data="test_wrong1")],
+            [InlineKeyboardButton(text="А) Военное присутствие в регионе", callback_data="test_wrong1a")],
             [InlineKeyboardButton(text="Б) Культурный обмен", callback_data="test_correct1")],
             [InlineKeyboardButton(text="В) Экономические санкции", callback_data="test_wrong1b")]
         ]),
@@ -723,138 +723,307 @@ async def handle_test(callback: CallbackQuery):
     data = test_score.get(user_id, {"score": 0, "current": 1})
     score = data["score"]
 
+    # ===== ВОПРОС 1 =====
     if callback.data == "test_correct1":
         score += 1
-        await callback.message.answer("✅ Верно!\n\nКультурный обмен — классический пример «мягкой силы».\n\n▶ Нажмите «Дальше»", reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next2")]]))
-    elif callback.data in ["test_wrong1", "test_wrong1b"]:
-        await callback.message.answer("❌ Неверно.\n\nМягкая сила работает через привлекательность культуры и ценностей.\n\n▶ Нажмите «Дальше»", reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next2")]]))
+        await callback.message.answer(
+            "✅ **Верно!**\n\nКультурный обмен — классический пример «мягкой силы». Термин ввёл Джозеф Най. На курсе «Публичная дипломатия: теория и практика» (доцент Безрученко М.П.) вы изучите это глубже.\n\n▶ Нажмите «Дальше»",
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next2")]]),
+            parse_mode="Markdown"
+        )
+    elif callback.data == "test_wrong1a":
+        await callback.message.answer(
+            "❌ **Неверно.**\n\nВоенное присутствие — это классический инструмент «жёсткой силы». Она опирается на принуждение и страх. Мягкая сила, напротив, работает через привлекательность культуры, ценностей и политических институтов. Именно её изучают на курсе «Публичная дипломатия» в магистратуре КубГУ.\n\n▶ Нажмите «Дальше»",
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next2")]]),
+            parse_mode="Markdown"
+        )
+    elif callback.data == "test_wrong1b":
+        await callback.message.answer(
+            "❌ **Неверно.**\n\nЭкономические санкции — это тоже «жёсткая сила». Они заставляют, а не привлекают. Мягкая сила — это когда другие страны сами хотят с вами сотрудничать, потому что разделяют ваши ценности и восхищаются вашей культурой.\n\n▶ Нажмите «Дальше»",
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next2")]]),
+            parse_mode="Markdown"
+        )
+
+    # ===== ВОПРОС 2 =====
     elif callback.data == "test_next2":
         await callback.message.answer(
             "📝 **Вопрос 2 из 7.**\n\n"
-            "Какая концепция лежит в основе теории «демократического мира»?\n\n"
+            "Как называется процесс, при котором страны передают часть суверенитета наднациональным органам?\n\n"
             "⬇ Выберите вариант ответа.",
             reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(text="А) Гарантия мира во всём мире", callback_data="test_wrong2a")],
-                [InlineKeyboardButton(text="Б) Демократия всегда побеждает", callback_data="test_wrong2b")],
-                [InlineKeyboardButton(text="В) Демократии не воюют между собой", callback_data="test_correct2")]
+                [InlineKeyboardButton(text="А) Глобализация", callback_data="test_wrong2a")],
+                [InlineKeyboardButton(text="Б) Демократизация", callback_data="test_wrong2b")],
+                [InlineKeyboardButton(text="В) Интеграция", callback_data="test_correct2")]
             ]),
             parse_mode="Markdown"
         )
     elif callback.data == "test_correct2":
         score += 1
-        await callback.message.answer("✅ Верно!\n\nДемократии крайне редко или никогда не воюют друг с другом.\n\n▶ Нажмите «Дальше»", reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next3")]]))
-    elif callback.data in ["test_wrong2a", "test_wrong2b"]:
-        await callback.message.answer("❌ Неверно.\n\nТеория объясняет, почему демократии избегают войн друг с другом.\n\n▶ Нажмите «Дальше»", reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next3")]]))
+        await callback.message.answer(
+            "✅ **Верно!**\n\nИнтеграция — это процесс сближения государств с передачей части полномочий общим органам. Яркий пример — Европейский союз. На курсе «Европейский регионализм» (доцент Аванесян А.А.) вы разберёте это детально.\n\n▶ Нажмите «Дальше»",
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next3")]]),
+            parse_mode="Markdown"
+        )
+    elif callback.data == "test_wrong2a":
+        await callback.message.answer(
+            "❌ **Неверно.**\n\nГлобализация — это более широкий процесс: рост взаимозависимости стран в экономике, культуре, информации. А вот передача части суверенитета наднациональным органам — это именно интеграция. ЕС — самый яркий пример. На курсе «Европейский регионализм» вы разберёте, как это работает на практике.\n\n▶ Нажмите «Дальше»",
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next3")]]),
+            parse_mode="Markdown"
+        )
+    elif callback.data == "test_wrong2b":
+        await callback.message.answer(
+            "❌ **Неверно.**\n\nДемократизация — это процесс внедрения демократических принципов и институтов внутри страны. К передаче суверенитета она не имеет прямого отношения. А интеграция — это когда страны добровольно отдают часть полномочий общим органам. Например, страны ЕС передали Брюсселю право регулировать торговлю и миграцию.\n\n▶ Нажмите «Дальше»",
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next3")]]),
+            parse_mode="Markdown"
+        )
+
+    # ===== ВОПРОС 3 =====
     elif callback.data == "test_next3":
         await callback.message.answer(
             "📝 **Вопрос 3 из 7.**\n\n"
-            "Что означает термин «балансирование» (balancing) в теории международных отношений?\n\n"
+            "Какая концепция лежит в основе теории «демократического мира»?\n\n"
             "⬇ Выберите вариант ответа.",
             reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(text="А) Сдерживание сильного через союзы и усилия", callback_data="test_correct3")],
-                [InlineKeyboardButton(text="Б) Отказ от союзов и нейтралитет", callback_data="test_wrong3a")],
-                [InlineKeyboardButton(text="В) Равное распределение сил между всеми", callback_data="test_wrong3b")]
+                [InlineKeyboardButton(text="А) Гарантия мира во всём мире", callback_data="test_wrong3a")],
+                [InlineKeyboardButton(text="Б) Демократия всегда побеждает", callback_data="test_wrong3b")],
+                [InlineKeyboardButton(text="В) Демократии не воюют между собой", callback_data="test_correct3")]
             ]),
             parse_mode="Markdown"
         )
     elif callback.data == "test_correct3":
         score += 1
-        await callback.message.answer("✅ Верно!\n\nБалансирование — это стратегия сдерживания гегемона.\n\n▶ Нажмите «Дальше»", reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next4")]]))
-    elif callback.data in ["test_wrong3a", "test_wrong3b"]:
-        await callback.message.answer("❌ Неверно.\n\nБалансирование — это создание союзов против сильного.\n\n▶ Нажмите «Дальше»", reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next4")]]))
+        await callback.message.answer(
+            "✅ **Верно!**\n\nТеория демократического мира утверждает: демократии крайне редко или никогда не воюют друг с другом. С авторитарными режимами они конфликтуют, но между собой — нет. На курсе профессора Ратушняка О.В. «Теория международных отношений: современные направления исследований» вы разберёте эту концепцию.\n\n▶ Нажмите «Дальше»",
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next4")]]),
+            parse_mode="Markdown"
+        )
+    elif callback.data == "test_wrong3a":
+        await callback.message.answer(
+            "❌ **Неверно.**\n\nТеория демократического мира не утверждает, что демократии приносят мир всем. Они вполне воюют с авторитарными режимами. Суть в другом: демократии не воюют между собой. Это подтверждается статистикой за последние два столетия. На курсе профессора Ратушняка О.В. вы разберёте критику этой теории.\n\n▶ Нажмите «Дальше»",
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next4")]]),
+            parse_mode="Markdown"
+        )
+    elif callback.data == "test_wrong3b":
+        await callback.message.answer(
+            "❌ **Неверно.**\n\nТеория демократического мира ничего не говорит о том, кто побеждает. Она объясняет, почему демократии избегают войн друг с другом. Вьетнам и Афганистан показали, что демократии могут и проигрывать.\n\n▶ Нажмите «Дальше»",
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next4")]]),
+            parse_mode="Markdown"
+        )
+
+    # ===== ВОПРОС 4 =====
     elif callback.data == "test_next4":
         await callback.message.answer(
             "📝 **Вопрос 4 из 7.**\n\n"
-            "Термин «Восточный вопрос» в дипломатической истории XIX века обозначал:\n\n"
+            "Что означает термин «балансирование» (balancing) в теории международных отношений?\n\n"
             "⬇ Выберите вариант ответа.",
             reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(text="А) Спор России и Китая о границах", callback_data="test_wrong4a")],
-                [InlineKeyboardButton(text="Б) Борьба держав за наследство Турции", callback_data="test_correct4")],
-                [InlineKeyboardButton(text="В) Борьба России и Японии за Корею", callback_data="test_wrong4b")],
-                [InlineKeyboardButton(text="Г) Статус Босфора после 1945 года", callback_data="test_wrong4c")]
+                [InlineKeyboardButton(text="А) Сдерживание сильного через союзы и усилия", callback_data="test_correct4")],
+                [InlineKeyboardButton(text="Б) Отказ от союзов и нейтралитет", callback_data="test_wrong4b")],
+                [InlineKeyboardButton(text="В) Равное распределение сил между всеми", callback_data="test_wrong4c")]
             ]),
             parse_mode="Markdown"
         )
     elif callback.data == "test_correct4":
         score += 1
-        await callback.message.answer("✅ Верно!\n\n«Восточный вопрос» — это борьба за раздел Османской империи.\n\n▶ Нажмите «Дальше»", reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next5")]]))
-    elif callback.data in ["test_wrong4a", "test_wrong4b", "test_wrong4c"]:
-        await callback.message.answer("❌ Неверно.\n\n«Восточный вопрос» — это про Османскую империю в XIX веке.\n\n▶ Нажмите «Дальше»", reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next5")]]))
+        await callback.message.answer(
+            "✅ **Верно!**\n\nБалансирование — это когда государство стремится уравновесить силу доминирующей державы: либо наращивая свою мощь (внутреннее балансирование), либо создавая союзы (внешнее балансирование). На курсе «Теория международных отношений» вы разберёте это.\n\n▶ Нажмите «Дальше»",
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next5")]]),
+            parse_mode="Markdown"
+        )
+    elif callback.data == "test_wrong4b":
+        await callback.message.answer(
+            "❌ **Неверно.**\n\nОтказ от союзов и нейтралитет — это другая стратегия: изоляционизм. А балансирование — это как раз создание коалиций против сильного. Кеннет Уолц, классик неореализма, считал балансирование главным законом международной политики.\n\n▶ Нажмите «Дальше»",
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next5")]]),
+            parse_mode="Markdown"
+        )
+    elif callback.data == "test_wrong4c":
+        await callback.message.answer(
+            "❌ **Неверно.**\n\nРавное распределение сил между всеми — это утопия. Балансирование — это конкретная стратегия: когда одна держава усиливается, другие объединяются или вооружаются, чтобы её сдержать. Это не про равенство, а про сдерживание гегемона.\n\n▶ Нажмите «Дальше»",
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next5")]]),
+            parse_mode="Markdown"
+        )
+
+    # ===== ВОПРОС 5 =====
     elif callback.data == "test_next5":
         await callback.message.answer(
             "📝 **Вопрос 5 из 7.**\n\n"
-            "Утрехтский мир 1713 года впервые закрепил принцип:\n\n"
+            "Термин «Восточный вопрос» в дипломатической истории XIX века обозначал:\n\n"
             "⬇ Выберите вариант ответа.",
             reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(text="А) Свободы мореплавания", callback_data="test_wrong5a")],
-                [InlineKeyboardButton(text="Б) Национального самоопределения", callback_data="test_wrong5b")],
-                [InlineKeyboardButton(text="В) Баланса сил как основы порядка", callback_data="test_correct5")],
-                [InlineKeyboardButton(text="Г) Нерушимости границ", callback_data="test_wrong5c")]
+                [InlineKeyboardButton(text="А) Спор России и Китая о границах", callback_data="test_wrong5a")],
+                [InlineKeyboardButton(text="Б) Борьба держав за наследство Турции", callback_data="test_correct5")],
+                [InlineKeyboardButton(text="В) Борьба России и Японии за Корею", callback_data="test_wrong5c")],
+                [InlineKeyboardButton(text="Г) Статус Босфора после 1945 года", callback_data="test_wrong5d")]
             ]),
             parse_mode="Markdown"
         )
     elif callback.data == "test_correct5":
         score += 1
-        await callback.message.answer("✅ Верно!\n\nУтрехтский мир закрепил принцип баланса сил.\n\n▶ Нажмите «Дальше»", reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next6")]]))
-    elif callback.data in ["test_wrong5a", "test_wrong5b", "test_wrong5c"]:
-        await callback.message.answer("❌ Неверно.\n\nУтрехтский мир закрепил баланс сил, а не свободу морей.\n\n▶ Нажмите «Дальше»", reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next6")]]))
+        await callback.message.answer(
+            "✅ **Верно!**\n\n«Восточный вопрос» — это дипломатическая борьба европейских держав за раздел ослабевшей Османской империи на протяжении всего XIX века. В магистратуре КубГУ вы детально разберёте эту тему на курсах по истории дипломатии и российско-турецким отношениям.\n\n▶ Нажмите «Дальше»",
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next6")]]),
+            parse_mode="Markdown"
+        )
+    elif callback.data == "test_wrong5a":
+        await callback.message.answer(
+            "❌ **Неверно.**\n\nСпор о границах с Китаем — это «Дальневосточный вопрос», а не «Восточный». В дипломатии XIX века «Восток» — это Ближний Восток и Османская империя. Именно её распад породил «Восточный вопрос»: кому достанутся Балканы, проливы и арабские земли.\n\n▶ Нажмите «Дальше»",
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next6")]]),
+            parse_mode="Markdown"
+        )
+    elif callback.data == "test_wrong5c":
+        await callback.message.answer(
+            "❌ **Неверно.**\n\nРусско-японский конфликт — это часть борьбы за Дальний Восток. А «Восточный вопрос» в XIX веке — это про Османскую империю. «Больной человек Европы», как её называл Николай I. Все великие державы решали: добить или сохранить, и кому что достанется.\n\n▶ Нажмите «Дальше»",
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next6")]]),
+            parse_mode="Markdown"
+        )
+    elif callback.data == "test_wrong5d":
+        await callback.message.answer(
+            "❌ **Неверно.**\n\nСтатус проливов после Второй мировой — это уже совсем другая эпоха и другая проблема. «Восточный вопрос» возник в конце XVIII века и доминировал в дипломатии весь XIX век. Суть: Османская империя слабеет, кто займёт её место на Балканах и Ближнем Востоке.\n\n▶ Нажмите «Дальше»",
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next6")]]),
+            parse_mode="Markdown"
+        )
+
+    # ===== ВОПРОС 6 =====
     elif callback.data == "test_next6":
         await callback.message.answer(
             "📝 **Вопрос 6 из 7.**\n\n"
-            "В чём суть концепции «хартленда»?\n\n"
+            "Утрехтский мир 1713 года, завершивший войну за Испанское наследство, впервые в истории международного права закрепил принцип:\n\n"
             "⬇ Выберите вариант ответа.",
             reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(text="А) Господство на море — ключ к торговле", callback_data="test_wrong6a")],
-                [InlineKeyboardButton(text="Б) Власть над Евразией — власть над миром", callback_data="test_correct6")],
-                [InlineKeyboardButton(text="В) Демократии должны нести свои ценности", callback_data="test_wrong6b")],
-                [InlineKeyboardButton(text="Г) Мир — это борьба цивилизаций", callback_data="test_wrong6c")]
+                [InlineKeyboardButton(text="А) Свободы мореплавания", callback_data="test_wrong6a")],
+                [InlineKeyboardButton(text="Б) Национального самоопределения", callback_data="test_wrong6b")],
+                [InlineKeyboardButton(text="В) Баланса сил как основы порядка", callback_data="test_correct6")],
+                [InlineKeyboardButton(text="Г) Нерушимости границ", callback_data="test_wrong6d")]
             ]),
             parse_mode="Markdown"
         )
     elif callback.data == "test_correct6":
         score += 1
-        await callback.message.answer("✅ Верно!\n\nХартленд — контроль над центром Евразии даёт власть над миром.\n\n▶ Нажмите «Дальше»", reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next7")]]))
-    elif callback.data in ["test_wrong6a", "test_wrong6b", "test_wrong6c"]:
-        await callback.message.answer("❌ Неверно.\n\nХартленд — это географический детерминизм.\n\n▶ Нажмите «Дальше»", reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next7")]]))
+        await callback.message.answer(
+            "✅ **Верно!**\n\nУтрехтский мир впервые письменно закрепил принцип «баланса сил» как цель международных договоров. Испанская и французская короны никогда не должны были объединиться под одним монархом. Этот принцип стал основой европейской дипломатии на два столетия вперёд.\n\n▶ Нажмите «Дальше»",
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next7")]]),
+            parse_mode="Markdown"
+        )
+    elif callback.data == "test_wrong6a":
+        await callback.message.answer(
+            "❌ **Неверно.**\n\nСвобода морей — это концепция XVII века, сформулированная голландским юристом Гуго Гроцием в трактате «Mare Liberum» (1609). А Утрехтский мир закрепил другое: принцип баланса сил. Испания и Франция никогда не должны объединиться — это записано в договоре.\n\n▶ Нажмите «Дальше»",
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next7")]]),
+            parse_mode="Markdown"
+        )
+    elif callback.data == "test_wrong6b":
+        await callback.message.answer(
+            "❌ **Неверно.**\n\nНациональное самоопределение — это принцип XX века. Его сформулировал президент США Вудро Вильсон после Первой мировой войны. А в 1713 году о правах наций не думали. Утрехт закрепил баланс сил: никакая держава не должна доминировать в Европе.\n\n▶ Нажмите «Дальше»",
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next7")]]),
+            parse_mode="Markdown"
+        )
+    elif callback.data == "test_wrong6d":
+        await callback.message.answer(
+            "❌ **Неверно.**\n\nПринцип нерушимости границ закреплён в Хельсинкском заключительном акте 1975 года. До этого границы перекраивались постоянно. Утрехтский мир закрепил другое: баланс сил. Испанская и французская короны разделены навсегда — это первый письменный принцип равновесия в истории.\n\n▶ Нажмите «Дальше»",
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next7")]]),
+            parse_mode="Markdown"
+        )
+
+    # ===== ВОПРОС 7 =====
     elif callback.data == "test_next7":
         await callback.message.answer(
             "📝 **Вопрос 7 из 7.**\n\n"
-            "Как называется процесс, при котором страны передают часть суверенитета наднациональным органам?\n\n"
+            "В чём суть концепции «хартленда» в классической геополитике?\n\n"
             "⬇ Выберите вариант ответа.",
             reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(text="А) Глобализация", callback_data="test_wrong7a")],
-                [InlineKeyboardButton(text="Б) Демократизация", callback_data="test_wrong7b")],
-                [InlineKeyboardButton(text="В) Интеграция", callback_data="test_correct7")]
+                [InlineKeyboardButton(text="А) Господство на море — ключ к торговле", callback_data="test_wrong7a")],
+                [InlineKeyboardButton(text="Б) Власть над Евразией — власть над миром", callback_data="test_correct7")],
+                [InlineKeyboardButton(text="В) Демократии должны нести свои ценности", callback_data="test_wrong7c")],
+                [InlineKeyboardButton(text="Г) Мир — это борьба цивилизаций", callback_data="test_wrong7d")]
             ]),
             parse_mode="Markdown"
         )
+
+    # ===== ОБРАБОТКА ОТВЕТОВ НА 7-й ВОПРОС =====
     elif callback.data == "test_correct7":
         score += 1
+        final_score = score
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="💼 Основная информация о программе", callback_data="info_placeholder")],
+            [InlineKeyboardButton(text="👨‍🏫 Задать вопрос о поступлении", callback_data="contacts_placeholder")],
+            [InlineKeyboardButton(text="🔄 Вернуться к симуляции", callback_data="choose_protocol")],
+            [InlineKeyboardButton(text="🔄 Пройти тест заново", callback_data="start_test")],
+            [InlineKeyboardButton(text="🎓 Прожить день магистранта", callback_data="start_day")]
+        ])
         await callback.message.answer_photo(
-        photo="https://storage2.bothelp.io/pecherichenko/a2/a2f1/a2f1eb3120c4158fe8cb11bb44b99e07/IMG_5030.jpeg",
-        caption=f"✅ Верно!\nИнтеграция — это сближение государств с передачей полномочий общим органам.\n\n🎓 Тест пройден!\n\nВы ответили правильно на {score} из 7 вопросов.\n\nМагистратура КубГУ ждёт вас!\n\n⬇ Выберите действие:",
-        reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+            photo="https://storage2.bothelp.io/pecherichenko/a2/a2f1/a2f1eb3120c4158fe8cb11bb44b99e07/IMG_5030.jpeg",
+            caption=f"✅ **Верно!**\n\nХартленд — это сердцевинная земля Евразии. Маккиндер считал: кто контролирует Восточную Европу — командует хартлендом, кто командует хартлендом — командует Мировым островом, кто командует Мировым островом — командует миром. На курсе «Международные отношения в XX–XXI вв. в контексте геополитических концепций» (профессор Ратушняк О.В.) вы разберёте эту теорию и её влияние на мировую политику.\n\n"
+                    f"🎓 **Тест пройден!**\n\n"
+                    f"Вы ответили правильно на {final_score} из 7 вопросов.\n\n"
+                    "Если вам было интересно — представьте, насколько глубже вы разберётесь в этих темах за два года обучения.\n\n"
+                    "Магистратура «Дипломатия: теория, история, практика» Кубанского государственного университета — это:\n"
+                    "• Сильный преподавательский состав\n"
+                    "• Аналитика, переговоры, публичная дипломатия\n"
+                    "• Специализация по регионам: Европа, Турция, АТР, Черноморский бассейн\n\n"
+                    "Приходите учиться. Мир ждёт тех, кто в нём разбирается.\n\n"
+                    "⬇ Выберите действие:",
+            reply_markup=keyboard,
+            parse_mode="Markdown"
+        )
+
+    elif callback.data == "test_wrong7a":
+        final_score = score
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="💼 Основная информация о программе", callback_data="info_placeholder")],
             [InlineKeyboardButton(text="👨‍🏫 Задать вопрос о поступлении", callback_data="contacts_placeholder")],
             [InlineKeyboardButton(text="🔄 Вернуться к симуляции", callback_data="choose_protocol")],
             [InlineKeyboardButton(text="🔄 Пройти тест заново", callback_data="start_test")],
             [InlineKeyboardButton(text="🎓 Прожить день магистранта", callback_data="start_day")]
         ])
-    )
+        await callback.message.answer_photo(
+            photo="https://storage2.bothelp.io/pecherichenko/a2/a2f1/a2f1eb3120c4158fe8cb11bb44b99e07/IMG_5030.jpeg",
+            caption=f"❌ **Неверно.**\n\nЭто концепция «морской силы» адмирала Мэхэна. Он считал, что господство на море — ключ к мировому влиянию. А хартленд — это противоположная теория: Маккиндер утверждал, что решает контроль над сухопутным центром Евразии. Две конкурирующие концепции, которые вы разберёте в магистратуре КубГУ.\n\n"
+                    f"🎓 **Тест пройден!**\n\n"
+                    f"Вы ответили правильно на {final_score} из 7 вопросов.\n\n"
+                    "Если вам было интересно — представьте, насколько глубже вы разберётесь в этих темах за два года обучения.\n\n"
+                    "Магистратура КубГУ ждёт вас!\n\n⬇ Выберите действие:",
+            reply_markup=keyboard,
+            parse_mode="Markdown"
+        )
 
-    elif callback.data in ["test_wrong7a", "test_wrong7b"]:
-         await callback.message.answer_photo(
-        photo="https://storage2.bothelp.io/pecherichenko/a2/a2f1/a2f1eb3120c4158fe8cb11bb44b99e07/IMG_5030.jpeg",
-        caption=f"❌ Неверно.\nИнтеграция — это передача части суверенитета общим органам (как в ЕС).\n\n🎓 Тест пройден!\n\nВы ответили правильно на {score} из 7 вопросов.\n\nМагистратура КубГУ ждёт вас!\n\n⬇ Выберите действие:",
-        reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+    elif callback.data == "test_wrong7c":
+        final_score = score
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="💼 Основная информация о программе", callback_data="info_placeholder")],
             [InlineKeyboardButton(text="👨‍🏫 Задать вопрос о поступлении", callback_data="contacts_placeholder")],
             [InlineKeyboardButton(text="🔄 Вернуться к симуляции", callback_data="choose_protocol")],
             [InlineKeyboardButton(text="🔄 Пройти тест заново", callback_data="start_test")],
             [InlineKeyboardButton(text="🎓 Прожить день магистранта", callback_data="start_day")]
         ])
-    )
+        await callback.message.answer_photo(
+            photo="https://storage2.bothelp.io/pecherichenko/a2/a2f1/a2f1eb3120c4158fe8cb11bb44b99e07/IMG_5030.jpeg",
+            caption=f"❌ **Неверно.**\n\nЭто ближе к теории демократического мира или концепции «распространения демократии». Хартленд — совсем другое. Это географический детерминизм: рельеф и расположение определяют силу государства. Центр Евразии неуязвим для морских держав — вот в чём суть.\n\n"
+                    f"🎓 **Тест пройден!**\n\n"
+                    f"Вы ответили правильно на {final_score} из 7 вопросов.\n\n"
+                    "Магистратура КубГУ ждёт вас!\n\n⬇ Выберите действие:",
+            reply_markup=keyboard,
+            parse_mode="Markdown"
+        )
 
+    elif callback.data == "test_wrong7d":
+        final_score = score
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="💼 Основная информация о программе", callback_data="info_placeholder")],
+            [InlineKeyboardButton(text="👨‍🏫 Задать вопрос о поступлении", callback_data="contacts_placeholder")],
+            [InlineKeyboardButton(text="🔄 Вернуться к симуляции", callback_data="choose_protocol")],
+            [InlineKeyboardButton(text="🔄 Пройти тест заново", callback_data="start_test")],
+            [InlineKeyboardButton(text="🎓 Прожить день магистранта", callback_data="start_day")]
+        ])
+        await callback.message.answer_photo(
+            photo="https://storage2.bothelp.io/pecherichenko/a2/a2f1/a2f1eb3120c4158fe8cb11bb44b99e07/IMG_5030.jpeg",
+            caption=f"❌ **Неверно.**\n\nЭто концепция Сэмюэля Хантингтона — «Столкновение цивилизаций». Она появилась в 1990-е годы. А хартленд — это классическая геополитика начала XX века. Маккиндер смотрел на карту и видел: огромная территория в центре Евразии недоступна для флота — и в этом ключ к мировому господству.\n\n"
+                    f"🎓 **Тест пройден!**\n\n"
+                    f"Вы ответили правильно на {final_score} из 7 вопросов.\n\n"
+                    "Магистратура КубГУ ждёт вас!\n\n⬇ Выберите действие:",
+            reply_markup=keyboard,
+            parse_mode="Markdown"
+        )
+
+    # ===== СОХРАНЕНИЕ РЕЗУЛЬТАТА =====
     test_score[user_id] = {"score": score, "current": 1}
     await callback.answer()
 
