@@ -10,6 +10,7 @@ import os
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import datetime
+test_score = {}
 
 TOKEN = os.getenv("TOKEN")
 
@@ -1824,6 +1825,24 @@ def run_web():
 
 # Запускаем веб-сервер в отдельном потоке
 threading.Thread(target=run_web, daemon=True).start()
+
+@dp.message(Command("test"))
+async def test_command(message: Message):
+    user_id = message.from_user.id
+    test_score[user_id] = {"score": 0, "current": 1}
+    await message.answer(
+        "📝 **Пробный тест магистратуры КубГУ**\n\n"
+        "**Вопрос 1 из 7.**\n\n"
+        "Что из перечисленного является примером «мягкой силы» (soft power) в международных отношениях?\n\n"
+        "⬇ Выберите вариант ответа.",
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="А) Военное присутствие в регионе", callback_data="test_wrong1a")],
+            [InlineKeyboardButton(text="Б) Культурный обмен", callback_data="test_correct1")],
+            [InlineKeyboardButton(text="В) Экономические санкции", callback_data="test_wrong1b")]
+        ]),
+        parse_mode="Markdown"
+    )
+    log_event(message.from_user.id, message.from_user.username or "unknown", "Начал тест")
 
 # ========== ЗАПУСК ==========
 async def main():
