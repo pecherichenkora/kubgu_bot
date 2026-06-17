@@ -1074,20 +1074,20 @@ async def handle_test(callback: CallbackQuery):
         )
 
         # === ВОПРОС О КОНТАКТЕ ===
-    user_id = callback.from_user.id
-    if not contact_provided.get(user_id, False):
-        contact_keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="✍️ Оставить контакт", callback_data="ask_contact_test")]
-        ])
-        await callback.message.answer(
-            "✍️ Хотите получать информацию о поступлении?\n"
-            "Напишите ваш email или номер телефона.",
-            reply_markup=contact_keyboard
-        )
-    else:
-        await callback.message.answer("✅ Спасибо, мы уже получили ваш контакт!")
+        user_id = callback.from_user.id
+        if not contact_provided.get(user_id, False):
+            contact_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text="✍️ Оставить контакт", callback_data="ask_contact_test")]
+            ])
+            await callback.message.answer(
+                "✍️ Хотите получать информацию о поступлении?\n"
+                "Напишите ваш email или номер телефона.",
+                reply_markup=contact_keyboard
+            )
+        else:
+            await callback.message.answer("✅ Спасибо, мы уже получили ваш контакт!")
     
-    await callback.answer()
+        await callback.answer()
 
     elif callback.data == "test_wrong7a":
         final_score = score
@@ -1110,21 +1110,21 @@ async def handle_test(callback: CallbackQuery):
             parse_mode="Markdown"
         )
 
-    # === ВОПРОС О КОНТАКТЕ ===
-    user_id = callback.from_user.id
-    if not contact_provided.get(user_id, False):
-        contact_keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="✍️ Оставить контакт", callback_data="ask_contact_test")]
-        ])
-        await callback.message.answer(
-            "✍️ Хотите получать информацию о поступлении?\n"
-            "Напишите ваш email или номер телефона.",
-            reply_markup=contact_keyboard
-        )
-    else:
-        await callback.message.answer("✅ Спасибо, мы уже получили ваш контакт!")
+        # === ВОПРОС О КОНТАКТЕ ===
+        user_id = callback.from_user.id
+        if not contact_provided.get(user_id, False):
+            contact_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text="✍️ Оставить контакт", callback_data="ask_contact_test")]
+            ])
+            await callback.message.answer(
+                "✍️ Хотите получать информацию о поступлении?\n"
+                "Напишите ваш email или номер телефона.",
+                reply_markup=contact_keyboard
+            )
+        else:
+            await callback.message.answer("✅ Спасибо, мы уже получили ваш контакт!")
     
-    await callback.answer()
+        await callback.answer()
 
     elif callback.data == "test_wrong7c":
         final_score = score
@@ -1146,21 +1146,21 @@ async def handle_test(callback: CallbackQuery):
             parse_mode="Markdown"
         )
 
-    # === ВОПРОС О КОНТАКТЕ ===
-    user_id = callback.from_user.id
-    if not contact_provided.get(user_id, False):
-        contact_keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="✍️ Оставить контакт", callback_data="ask_contact_test")]
-        ])
-        await callback.message.answer(
-            "✍️ Хотите получать информацию о поступлении?\n"
-            "Напишите ваш email или номер телефона.",
-            reply_markup=contact_keyboard
-        )
-    else:
-        await callback.message.answer("✅ Спасибо, мы уже получили ваш контакт!")
+        # === ВОПРОС О КОНТАКТЕ ===
+        user_id = callback.from_user.id
+        if not contact_provided.get(user_id, False):
+             contact_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text="✍️ Оставить контакт", callback_data="ask_contact_test")]
+            ])
+            await callback.message.answer(
+                "✍️ Хотите получать информацию о поступлении?\n"
+                "Напишите ваш email или номер телефона.",
+                reply_markup=contact_keyboard
+            )
+        else:
+            await callback.message.answer("✅ Спасибо, мы уже получили ваш контакт!")
     
-    await callback.answer()
+        await callback.answer()
 
     elif callback.data == "test_wrong7d":
         final_score = score
@@ -1182,21 +1182,21 @@ async def handle_test(callback: CallbackQuery):
             parse_mode="Markdown"
         )
 
-    # === ВОПРОС О КОНТАКТЕ ===
-    user_id = callback.from_user.id
-    if not contact_provided.get(user_id, False):
-        contact_keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="✍️ Оставить контакт", callback_data="ask_contact_test")]
-        ])
-        await callback.message.answer(
-            "✍️ Хотите получать информацию о поступлении?\n"
-            "Напишите ваш email или номер телефона.",
-            reply_markup=contact_keyboard
-        )
-    else:
-        await callback.message.answer("✅ Спасибо, мы уже получили ваш контакт!")
+        # === ВОПРОС О КОНТАКТЕ ===
+        user_id = callback.from_user.id
+        if not contact_provided.get(user_id, False):
+            contact_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text="✍️ Оставить контакт", callback_data="ask_contact_test")]
+            ])
+            await callback.message.answer(
+                "✍️ Хотите получать информацию о поступлении?\n"
+                "Напишите ваш email или номер телефона.",
+                 reply_markup=contact_keyboard
+            )
+        else:
+            await callback.message.answer("✅ Спасибо, мы уже получили ваш контакт!")
     
-    await callback.answer()
+        await callback.answer()
 
     # ===== СОХРАНЕНИЕ РЕЗУЛЬТАТА =====
     test_score[user_id] = {"score": score, "current": 1}
