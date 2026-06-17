@@ -11,7 +11,7 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import datetime
 
-TOKEN = "8843234890:AAGqFxhPN7ALZ9VephCAT_NXGtzkg-ROYBU"
+TOKEN = os.getenv("TOKEN")
 
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=TOKEN)
