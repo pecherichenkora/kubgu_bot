@@ -7,12 +7,45 @@ from aiogram.filters import Command
 from flask import Flask
 import threading
 import os
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+import datetime
 
 TOKEN = "8843234890:AAGqFxhPN7ALZ9VephCAT_NXGtzkg-ROYBU"
 
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
+
+# ========== ПОДКЛЮЧЕНИЕ К GOOGLE TABLES ==========
+def get_sheet():
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+    creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
+    client = gspread.authorize(creds)
+    # ЗАМЕНИ НА СВОЙ ID ТАБЛИЦЫ (вставь его между кавычками)
+    sheet = client.open_by_key("1hoDNwIulpgsefccNZgmyL8ix4JB4e6YlEeRGJ6Mw7S0").sheet1
+    return sheet
+
+def log_event(user_id, username, step, result="", score=0):
+    """Записывает событие в Google Таблицу"""
+    try:
+        sheet = get_sheet()
+        now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        all_records = sheet.get_all_values()
+        user_found = False
+        for i, row in enumerate(all_records):
+            if len(row) > 0 and str(row[0]) == str(user_id):
+                user_found = True
+                sheet.update_cell(i+1, 4, step)
+                if result:
+                    sheet.update_cell(i+1, 5, result)
+                if score > 0:
+                    sheet.update_cell(i+1, 6, score)
+                break
+        if not user_found:
+            sheet.append_row([user_id, username, now, step, result, score])
+    except Exception as e:
+        print(f"Ошибка записи в Google Sheets: {e}")
 
 def shuffle_buttons(buttons_list):
     shuffled = buttons_list.copy()
@@ -33,6 +66,7 @@ async def start(message: Message):
                 "⬇ Нажмите кнопку «Продолжить», чтобы получить первую вводную.",
         reply_markup=keyboard
     )
+    log_event(message.from_user.id, message.from_user.username or "unknown", "started")
 
 # ========== СБОР ИМЕНИ ==========
 @dp.callback_query(F.data == "continue_after_welcome")
@@ -63,6 +97,7 @@ async def choose_protocol(callback: CallbackQuery):
         "⬇ Нажмите на один из вариантов.",
         reply_markup=keyboard
     )
+    log_event(callback.from_user.id, callback.from_user.username or "unknown", "chose_protocol")
     await callback.answer()
 
 # ===================== ПРОТОКОЛ АНАЛИТИКА =====================
@@ -694,11 +729,10 @@ async def final_common_stub(callback: CallbackQuery):
                 "⬇ Выберите действие:",
         reply_markup=keyboard
     )
+    log_event(callback.from_user.id, callback.from_user.username or "unknown", "completed_track")
     await callback.answer()
 
 # ========== ТЕСТ ==========
-test_score = {}
-
 @dp.callback_query(F.data == "start_test")
 async def start_test(callback: CallbackQuery):
     user_id = callback.from_user.id
@@ -715,6 +749,7 @@ async def start_test(callback: CallbackQuery):
         ]),
         parse_mode="Markdown"
     )
+    log_event(callback.from_user.id, callback.from_user.username or "unknown", "started_test")
     await callback.answer()
 
 @dp.callback_query(F.data.startswith("test_"))
@@ -940,88 +975,92 @@ async def handle_test(callback: CallbackQuery):
 
     # ===== ОБРАБОТКА ОТВЕТОВ НА 7-й ВОПРОС =====
     elif callback.data == "test_correct7":
-        score += 1
-        final_score = score
-        keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="💼 Основная информация о программе", callback_data="info_placeholder")],
-            [InlineKeyboardButton(text="👨‍🏫 Задать вопрос о поступлении", callback_data="contacts_placeholder")],
-            [InlineKeyboardButton(text="🔄 Вернуться к симуляции", callback_data="choose_protocol")],
-            [InlineKeyboardButton(text="🔄 Пройти тест заново", callback_data="start_test")],
-            [InlineKeyboardButton(text="🎓 Прожить день магистранта", callback_data="start_day")]
-        ])
-        await callback.message.answer_photo(
-            photo="https://storage2.bothelp.io/pecherichenko/a2/a2f1/a2f1eb3120c4158fe8cb11bb44b99e07/IMG_5030.jpeg",
-            caption=f"✅ **Верно!**\n\nХартленд — это сердцевинная земля Евразии. Маккиндер считал: кто контролирует Восточную Европу — командует хартлендом, кто командует хартлендом — командует Мировым островом, кто командует Мировым островом — командует миром. На курсе «Международные отношения в XX–XXI вв. в контексте геополитических концепций» (профессор Ратушняк О.В.) вы разберёте эту теорию и её влияние на мировую политику.\n\n"
-                    f"🎓 **Тест пройден!**\n\n"
-                    f"Вы ответили правильно на {final_score} из 7 вопросов.\n\n"
-                    "Если вам было интересно — представьте, насколько глубже вы разберётесь в этих темах за два года обучения.\n\n"
-                    "Магистратура «Дипломатия: теория, история, практика» Кубанского государственного университета — это:\n"
-                    "• Сильный преподавательский состав\n"
-                    "• Аналитика, переговоры, публичная дипломатия\n"
-                    "• Специализация по регионам: Европа, Турция, АТР, Черноморский бассейн\n\n"
-                    "Приходите учиться. Мир ждёт тех, кто в нём разбирается.\n\n"
-                    "⬇ Выберите действие:",
-            reply_markup=keyboard,
-            parse_mode="Markdown"
-        )
+    score += 1
+    final_score = score
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="💼 Основная информация о программе", callback_data="info_placeholder")],
+        [InlineKeyboardButton(text="👨‍🏫 Задать вопрос о поступлении", callback_data="contacts_placeholder")],
+        [InlineKeyboardButton(text="🔄 Вернуться к симуляции", callback_data="choose_protocol")],
+        [InlineKeyboardButton(text="🔄 Пройти тест заново", callback_data="start_test")],
+        [InlineKeyboardButton(text="🎓 Прожить день магистранта", callback_data="start_day")]
+    ])
+    log_event(callback.from_user.id, callback.from_user.username or "unknown", "completed_test", result=f"{final_score} из 7", score=final_score)
+    await callback.message.answer_photo(
+        photo="https://storage2.bothelp.io/pecherichenko/a2/a2f1/a2f1eb3120c4158fe8cb11bb44b99e07/IMG_5030.jpeg",
+        caption=f"✅ **Верно!**\n\nХартленд — это сердцевинная земля Евразии. Маккиндер считал: кто контролирует Восточную Европу — командует хартлендом, кто командует хартлендом — командует Мировым островом, кто командует Мировым островом — командует миром. На курсе «Международные отношения в XX–XXI вв. в контексте геополитических концепций» (профессор Ратушняк О.В.) вы разберёте эту теорию и её влияние на мировую политику.\n\n"
+                f"🎓 **Тест пройден!**\n\n"
+                f"Вы ответили правильно на {final_score} из 7 вопросов.\n\n"
+                "Если вам было интересно — представьте, насколько глубже вы разберётесь в этих темах за два года обучения.\n\n"
+                "Магистратура «Дипломатия: теория, история, практика» Кубанского государственного университета — это:\n"
+                "• Сильный преподавательский состав\n"
+                "• Аналитика, переговоры, публичная дипломатия\n"
+                "• Специализация по регионам: Европа, Турция, АТР, Черноморский бассейн\n\n"
+                "Приходите учиться. Мир ждёт тех, кто в нём разбирается.\n\n"
+                "⬇ Выберите действие:",
+        reply_markup=keyboard,
+        parse_mode="Markdown"
+    )
 
     elif callback.data == "test_wrong7a":
-        final_score = score
-        keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="💼 Основная информация о программе", callback_data="info_placeholder")],
-            [InlineKeyboardButton(text="👨‍🏫 Задать вопрос о поступлении", callback_data="contacts_placeholder")],
-            [InlineKeyboardButton(text="🔄 Вернуться к симуляции", callback_data="choose_protocol")],
-            [InlineKeyboardButton(text="🔄 Пройти тест заново", callback_data="start_test")],
-            [InlineKeyboardButton(text="🎓 Прожить день магистранта", callback_data="start_day")]
-        ])
-        await callback.message.answer_photo(
-            photo="https://storage2.bothelp.io/pecherichenko/a2/a2f1/a2f1eb3120c4158fe8cb11bb44b99e07/IMG_5030.jpeg",
-            caption=f"❌ **Неверно.**\n\nЭто концепция «морской силы» адмирала Мэхэна. Он считал, что господство на море — ключ к мировому влиянию. А хартленд — это противоположная теория: Маккиндер утверждал, что решает контроль над сухопутным центром Евразии. Две конкурирующие концепции, которые вы разберёте в магистратуре КубГУ.\n\n"
-                    f"🎓 **Тест пройден!**\n\n"
-                    f"Вы ответили правильно на {final_score} из 7 вопросов.\n\n"
-                    "Если вам было интересно — представьте, насколько глубже вы разберётесь в этих темах за два года обучения.\n\n"
-                    "Магистратура КубГУ ждёт вас!\n\n⬇ Выберите действие:",
-            reply_markup=keyboard,
-            parse_mode="Markdown"
-        )
+    final_score = score
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="💼 Основная информация о программе", callback_data="info_placeholder")],
+        [InlineKeyboardButton(text="👨‍🏫 Задать вопрос о поступлении", callback_data="contacts_placeholder")],
+        [InlineKeyboardButton(text="🔄 Вернуться к симуляции", callback_data="choose_protocol")],
+        [InlineKeyboardButton(text="🔄 Пройти тест заново", callback_data="start_test")],
+        [InlineKeyboardButton(text="🎓 Прожить день магистранта", callback_data="start_day")]
+    ])
+    log_event(callback.from_user.id, callback.from_user.username or "unknown", "completed_test", result=f"{final_score} из 7", score=final_score)
+    await callback.message.answer_photo(
+        photo="https://storage2.bothelp.io/pecherichenko/a2/a2f1/a2f1eb3120c4158fe8cb11bb44b99e07/IMG_5030.jpeg",
+        caption=f"❌ **Неверно.**\n\nЭто концепция «морской силы» адмирала Мэхэна. Он считал, что господство на море — ключ к мировому влиянию. А хартленд — это противоположная теория: Маккиндер утверждал, что решает контроль над сухопутным центром Евразии. Две конкурирующие концепции, которые вы разберёте в магистратуре КубГУ.\n\n"
+                f"🎓 **Тест пройден!**\n\n"
+                f"Вы ответили правильно на {final_score} из 7 вопросов.\n\n"
+                "Если вам было интересно — представьте, насколько глубже вы разберётесь в этих темах за два года обучения.\n\n"
+                "Магистратура КубГУ ждёт вас!\n\n⬇ Выберите действие:",
+        reply_markup=keyboard,
+        parse_mode="Markdown"
+    )
 
     elif callback.data == "test_wrong7c":
-        final_score = score
-        keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="💼 Основная информация о программе", callback_data="info_placeholder")],
-            [InlineKeyboardButton(text="👨‍🏫 Задать вопрос о поступлении", callback_data="contacts_placeholder")],
-            [InlineKeyboardButton(text="🔄 Вернуться к симуляции", callback_data="choose_protocol")],
-            [InlineKeyboardButton(text="🔄 Пройти тест заново", callback_data="start_test")],
-            [InlineKeyboardButton(text="🎓 Прожить день магистранта", callback_data="start_day")]
-        ])
-        await callback.message.answer_photo(
-            photo="https://storage2.bothelp.io/pecherichenko/a2/a2f1/a2f1eb3120c4158fe8cb11bb44b99e07/IMG_5030.jpeg",
-            caption=f"❌ **Неверно.**\n\nЭто ближе к теории демократического мира или концепции «распространения демократии». Хартленд — совсем другое. Это географический детерминизм: рельеф и расположение определяют силу государства. Центр Евразии неуязвим для морских держав — вот в чём суть.\n\n"
-                    f"🎓 **Тест пройден!**\n\n"
-                    f"Вы ответили правильно на {final_score} из 7 вопросов.\n\n"
-                    "Магистратура КубГУ ждёт вас!\n\n⬇ Выберите действие:",
-            reply_markup=keyboard,
-            parse_mode="Markdown"
-        )
+    final_score = score
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="💼 Основная информация о программе", callback_data="info_placeholder")],
+        [InlineKeyboardButton(text="👨‍🏫 Задать вопрос о поступлении", callback_data="contacts_placeholder")],
+        [InlineKeyboardButton(text="🔄 Вернуться к симуляции", callback_data="choose_protocol")],
+        [InlineKeyboardButton(text="🔄 Пройти тест заново", callback_data="start_test")],
+        [InlineKeyboardButton(text="🎓 Прожить день магистранта", callback_data="start_day")]
+    ])
+    log_event(callback.from_user.id, callback.from_user.username or "unknown", "completed_test", result=f"{final_score} из 7", score=final_score)
+    await callback.message.answer_photo(
+        photo="https://storage2.bothelp.io/pecherichenko/a2/a2f1/a2f1eb3120c4158fe8cb11bb44b99e07/IMG_5030.jpeg",
+        caption=f"❌ **Неверно.**\n\nЭто ближе к теории демократического мира или концепции «распространения демократии». Хартленд — совсем другое. Это географический детерминизм: рельеф и расположение определяют силу государства. Центр Евразии неуязвим для морских держав — вот в чём суть.\n\n"
+                f"🎓 **Тест пройден!**\n\n"
+                f"Вы ответили правильно на {final_score} из 7 вопросов.\n\n"
+                "Магистратура КубГУ ждёт вас!\n\n⬇ Выберите действие:",
+        reply_markup=keyboard,
+        parse_mode="Markdown"
+    )
 
     elif callback.data == "test_wrong7d":
-        final_score = score
-        keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="💼 Основная информация о программе", callback_data="info_placeholder")],
-            [InlineKeyboardButton(text="👨‍🏫 Задать вопрос о поступлении", callback_data="contacts_placeholder")],
-            [InlineKeyboardButton(text="🔄 Вернуться к симуляции", callback_data="choose_protocol")],
-            [InlineKeyboardButton(text="🔄 Пройти тест заново", callback_data="start_test")],
-            [InlineKeyboardButton(text="🎓 Прожить день магистранта", callback_data="start_day")]
-        ])
-        await callback.message.answer_photo(
-            photo="https://storage2.bothelp.io/pecherichenko/a2/a2f1/a2f1eb3120c4158fe8cb11bb44b99e07/IMG_5030.jpeg",
-            caption=f"❌ **Неверно.**\n\nЭто концепция Сэмюэля Хантингтона — «Столкновение цивилизаций». Она появилась в 1990-е годы. А хартленд — это классическая геополитика начала XX века. Маккиндер смотрел на карту и видел: огромная территория в центре Евразии недоступна для флота — и в этом ключ к мировому господству.\n\n"
-                    f"🎓 **Тест пройден!**\n\n"
-                    f"Вы ответили правильно на {final_score} из 7 вопросов.\n\n"
-                    "Магистратура КубГУ ждёт вас!\n\n⬇ Выберите действие:",
-            reply_markup=keyboard,
-            parse_mode="Markdown"
-        )
+    final_score = score
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="💼 Основная информация о программе", callback_data="info_placeholder")],
+        [InlineKeyboardButton(text="👨‍🏫 Задать вопрос о поступлении", callback_data="contacts_placeholder")],
+        [InlineKeyboardButton(text="🔄 Вернуться к симуляции", callback_data="choose_protocol")],
+        [InlineKeyboardButton(text="🔄 Пройти тест заново", callback_data="start_test")],
+        [InlineKeyboardButton(text="🎓 Прожить день магистранта", callback_data="start_day")]
+    ])
+    log_event(callback.from_user.id, callback.from_user.username or "unknown", "completed_test", result=f"{final_score} из 7", score=final_score)
+    await callback.message.answer_photo(
+        photo="https://storage2.bothelp.io/pecherichenko/a2/a2f1/a2f1eb3120c4158fe8cb11bb44b99e07/IMG_5030.jpeg",
+        caption=f"❌ **Неверно.**\n\nЭто концепция Сэмюэля Хантингтона — «Столкновение цивилизаций». Она появилась в 1990-е годы. А хартленд — это классическая геополитика начала XX века. Маккиндер смотрел на карту и видел: огромная территория в центре Евразии недоступна для флота — и в этом ключ к мировому господству.\n\n"
+                f"🎓 **Тест пройден!**\n\n"
+                f"Вы ответили правильно на {final_score} из 7 вопросов.\n\n"
+                "Магистратура КубГУ ждёт вас!\n\n⬇ Выберите действие:",
+        reply_markup=keyboard,
+        parse_mode="Markdown"
+    )
 
     # ===== СОХРАНЕНИЕ РЕЗУЛЬТАТА =====
     test_score[user_id] = {"score": score, "current": 1}
@@ -1042,6 +1081,7 @@ async def start_day(callback: CallbackQuery):
         reply_markup=keyboard,
         parse_mode="Markdown"
     )
+    log_event(callback.from_user.id, callback.from_user.username or "unknown", "started_day")
     await callback.answer()
 
 @dp.callback_query(F.data == "day_early")
@@ -1169,6 +1209,7 @@ async def info_main_menu(callback: CallbackQuery):
         reply_markup=keyboard,
         parse_mode="Markdown"
     )
+    log_event(callback.from_user.id, callback.from_user.username or "unknown", "reached_info")
     await callback.answer()
 
 @dp.callback_query(F.data == "info_goals")
