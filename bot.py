@@ -27,7 +27,7 @@ def get_sheet():
     creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
     client = gspread.authorize(creds)
     # ЗАМЕНИ НА СВОЙ ID ТАБЛИЦЫ (вставь его между кавычками)
-    sheet = client.open_by_key("ТВОЙ_ID_ТАБЛИЦЫ").sheet1
+    sheet = client.open_by_key("1hoDNwIulpgsefccNZgmyL8ix4JB4e6YlEeRGJ6Mw7S0").sheet1
     return sheet
 
 def log_event(user_id, username, step, result="", score=0):
