@@ -1092,8 +1092,6 @@ async def handle_test(callback: CallbackQuery):
             )
         else:
             await callback.message.answer("✅ Спасибо, мы уже получили ваш контакт!")
-    
-        await callback.answer()
 
     elif callback.data == "test_wrong7a":
         final_score = score
@@ -1129,8 +1127,6 @@ async def handle_test(callback: CallbackQuery):
             )
         else:
             await callback.message.answer("✅ Спасибо, мы уже получили ваш контакт!")
-    
-        await callback.answer()
 
     elif callback.data == "test_wrong7c":
         final_score = score
@@ -1166,8 +1162,6 @@ async def handle_test(callback: CallbackQuery):
         else:
             await callback.message.answer("✅ Спасибо, мы уже получили ваш контакт!")
     
-        await callback.answer()
-    
     elif callback.data == "test_wrong7d":
         final_score = score
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
@@ -1201,8 +1195,6 @@ async def handle_test(callback: CallbackQuery):
             )
         else:
             await callback.message.answer("✅ Спасибо, мы уже получили ваш контакт!")
-    
-        await callback.answer()
 
     # ===== СОХРАНЕНИЕ РЕЗУЛЬТАТА =====
     test_score[user_id] = {"score": score, "current": 1}
