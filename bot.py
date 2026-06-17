@@ -27,59 +27,34 @@ def get_sheet():
     creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
     client = gspread.authorize(creds)
     # ЗАМЕНИ НА СВОЙ ID ТАБЛИЦЫ (вставь его между кавычками)
-    sheet = client.open_by_key("1hoDNwIulpgsefccNZgmyL8ix4JB4e6YlEeRGJ6Mw7S0").sheet1
+    sheet = client.open_by_key("ТВОЙ_ID_ТАБЛИЦЫ").sheet1
     return sheet
 
 def log_event(user_id, username, step, result="", score=0):
-    """Записывает событие в Google Таблицу (одна строка на пользователя)"""
+    """Записывает событие в Google Таблицу — только ID и имя пользователя"""
     try:
         sheet = get_sheet()
         now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
-        # Словарь соответствия шагов и колонок
-        step_columns = {
-            "started": 2,           # колонка C
-            "chose_protocol": 3,    # колонка D
-            "started_test": 4,      # колонка E
-            "completed_test": 5,    # колонка F
-            "reached_info": 7,      # колонка H
-            "started_day": 8,       # колонка I
-            "completed_track": 9    # колонка J
-        }
-        
         all_records = sheet.get_all_values()
         user_found = False
+        row_index = None
         
         for i, row in enumerate(all_records):
             if len(row) > 0 and str(row[0]) == str(user_id):
                 user_found = True
                 row_index = i + 1
-                # Обновляем нужную колонку для этого шага
-                if step in step_columns:
-                    sheet.update_cell(row_index, step_columns[step] + 1, now)
-                if result and step == "completed_test":
-                    sheet.update_cell(row_index, 6, result)  # колонка G (результат)
-                    sheet.update_cell(row_index, 7, score)   # колонка H (баллы)
                 break
         
         if not user_found:
-            # Создаём новую строку
-            new_row = [user_id, username]
-            new_row.extend([""] * 8)  # 8 пустых колонок
-            
-            if step in step_columns:
-                new_row[step_columns[step]] = now
-            if result and step == "completed_test":
-                new_row[5] = result
-                new_row[6] = score
-            
-            sheet.append_row(new_row)
+            # Если пользователь новый — создаём строку с ID и именем
+            sheet.append_row([user_id, username])
             
     except Exception as e:
         print(f"Ошибка записи в Google Sheets: {e}")
 
 def log_contact(user_id, username, contact, step):
-    """Сохраняет контакт пользователя в Google Таблицу"""
+    """Сохраняет контакт пользователя в Google Таблицу (только 4 колонки)"""
     try:
         sheet = get_sheet()
         now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -95,12 +70,12 @@ def log_contact(user_id, username, contact, step):
                 break
         
         if user_found:
-            sheet.update_cell(row_index, 9, contact)   # колонка I
-            sheet.update_cell(row_index, 10, now)      # колонка J
-            sheet.update_cell(row_index, 11, step)     # колонка K
+            # Обновляем контакт и время в 3-й и 4-й колонках
+            sheet.update_cell(row_index, 3, contact)   # колонка C
+            sheet.update_cell(row_index, 4, now)       # колонка D
         else:
-            new_row = [user_id, username, "", "", "", "", "", "", contact, now, step]
-            sheet.append_row(new_row)
+            # Создаём новую строку с ID, именем, контактом и временем
+            sheet.append_row([user_id, username, contact, now])
             
     except Exception as e:
         print(f"Ошибка записи контакта в Google Sheets: {e}")
