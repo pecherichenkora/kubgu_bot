@@ -775,8 +775,6 @@ async def final_common_stub(callback: CallbackQuery):
             "Напишите ваш email или номер телефона.",
             reply_markup=contact_keyboard
         )
-    else:
-        await callback.message.answer("✅ Спасибо, мы уже получили ваш контакт!")
 
     await callback.answer()
     
@@ -1066,8 +1064,6 @@ async def handle_test(callback: CallbackQuery):
                 "Напишите ваш email или номер телефона.",
                 reply_markup=contact_keyboard
             )
-        else:
-            await callback.message.answer("✅ Спасибо, мы уже получили ваш контакт!")
 
     elif callback.data == "test_wrong7a":
         final_score = score
@@ -1101,8 +1097,6 @@ async def handle_test(callback: CallbackQuery):
                 "Напишите ваш email или номер телефона.",
                 reply_markup=contact_keyboard
             )
-        else:
-            await callback.message.answer("✅ Спасибо, мы уже получили ваш контакт!")
 
     elif callback.data == "test_wrong7c":
         final_score = score
@@ -1135,8 +1129,6 @@ async def handle_test(callback: CallbackQuery):
                 "Напишите ваш email или номер телефона.",
                 reply_markup=contact_keyboard
             )
-        else:
-            await callback.message.answer("✅ Спасибо, мы уже получили ваш контакт!")
     
     elif callback.data == "test_wrong7d":
         final_score = score
@@ -1169,8 +1161,6 @@ async def handle_test(callback: CallbackQuery):
                 "Напишите ваш email или номер телефона.",
                  reply_markup=contact_keyboard
             )
-        else:
-            await callback.message.answer("✅ Спасибо, мы уже получили ваш контакт!")
 
     # ===== СОХРАНЕНИЕ РЕЗУЛЬТАТА =====
     test_score[user_id] = {"score": score, "current": 1}
@@ -1308,8 +1298,6 @@ async def day_final(callback: CallbackQuery):
             "Напишите ваш email или номер телефона.",
             reply_markup=contact_keyboard
         )
-    else:
-        await callback.message.answer("✅ Спасибо, мы уже получили ваш контакт!")
         
     await callback.answer()
 
@@ -1347,8 +1335,6 @@ async def info_main_menu(callback: CallbackQuery):
             "Напишите ваш email или номер телефона.",
             reply_markup=contact_keyboard
         )
-    else:
-        await callback.message.answer("✅ Спасибо, мы уже получили ваш контакт!")
         
     await callback.answer()
 
