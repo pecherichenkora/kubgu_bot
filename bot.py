@@ -778,7 +778,7 @@ async def final_common_stub(callback: CallbackQuery):
         [InlineKeyboardButton(text="🎓 Прожить день магистранта", callback_data="start_day")]
     ])
     await callback.message.answer_photo(
-        photo="https://storage2.bothelp.io/pecherichenko/8e/8ed7/8ed7ee41fb372606bdfceecd74eda094/IMG_4966.jpeg",
+        photo="https://storage2.bothelp.io/pecherichenko/8e/8ed7/8ed7ee41fb372606bdfececd74eda094/IMG_4966.jpeg",
         caption="🎓 Ситуационный центр КубГУ завершает работу.\n\n"
                 "Вы прошли испытание и увидели лишь малую часть того, чему учат в магистратуре «Дипломатия: теория, история, практика» Кубанского государственного университета.\n\n"
                 "Руководитель программы — Кумпан Вадим Александрович, кандидат исторических наук, доцент кафедры всеобщей истории и международных отношений.\n\n"
@@ -803,7 +803,7 @@ async def final_common_stub(callback: CallbackQuery):
         await callback.message.answer("✅ Спасибо, мы уже получили ваш контакт!")
 
     await callback.answer()
-
+    
 # ========== ТЕСТ ==========
 @dp.callback_query(F.data == "start_test")
 async def start_test(callback: CallbackQuery):
