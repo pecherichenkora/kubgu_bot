@@ -17,6 +17,9 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
+# ========== ДЛЯ ОТСЛЕЖИВАНИЯ КОНТАКТОВ ==========
+contact_provided = {}  # user_id: True/False
+
 # ========== ПОДКЛЮЧЕНИЕ К GOOGLE TABLES ==========
 def get_sheet():
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
@@ -34,7 +37,7 @@ def log_event(user_id, username, step, result="", score=0):
         
         # Словарь соответствия шагов и колонок
         step_columns = {
-            "started": 2,           # колонка C (индекс 2)
+            "started": 2,           # колонка C
             "chose_protocol": 3,    # колонка D
             "started_test": 4,      # колонка E
             "completed_test": 5,    # колонка F
@@ -59,22 +62,47 @@ def log_event(user_id, username, step, result="", score=0):
                 break
         
         if not user_found:
-            # Создаём новую строку с ID и username
+            # Создаём новую строку
             new_row = [user_id, username]
-            # Добавляем пустые ячейки для всех колонок (всего 10 колонок)
-            new_row.extend([""] * 8)  # 8 пустых колонок для шагов
+            new_row.extend([""] * 8)  # 8 пустых колонок
             
-            # Заполняем нужную колонку для этого шага
             if step in step_columns:
                 new_row[step_columns[step]] = now
             if result and step == "completed_test":
-                new_row[5] = result  # результат
-                new_row[6] = score   # баллы
+                new_row[5] = result
+                new_row[6] = score
             
             sheet.append_row(new_row)
             
     except Exception as e:
         print(f"Ошибка записи в Google Sheets: {e}")
+
+def log_contact(user_id, username, contact, step):
+    """Сохраняет контакт пользователя в Google Таблицу"""
+    try:
+        sheet = get_sheet()
+        now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        all_records = sheet.get_all_values()
+        user_found = False
+        row_index = None
+        
+        for i, row in enumerate(all_records):
+            if len(row) > 0 and str(row[0]) == str(user_id):
+                user_found = True
+                row_index = i + 1
+                break
+        
+        if user_found:
+            sheet.update_cell(row_index, 9, contact)   # колонка I
+            sheet.update_cell(row_index, 10, now)      # колонка J
+            sheet.update_cell(row_index, 11, step)     # колонка K
+        else:
+            new_row = [user_id, username, "", "", "", "", "", "", contact, now, step]
+            sheet.append_row(new_row)
+            
+    except Exception as e:
+        print(f"Ошибка записи контакта в Google Sheets: {e}")
 
 def shuffle_buttons(buttons_list):
     shuffled = buttons_list.copy()
@@ -739,7 +767,7 @@ async def D4_panic(callback: CallbackQuery):
     )
     await callback.answer()
 
-# ===================== ОБЩИЙ ФИНАЛ =====================
+# =================== ОБЩИЙ ФИНАЛ ===================
 @dp.callback_query(F.data == "final_common_stub")
 async def final_common_stub(callback: CallbackQuery):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
@@ -750,7 +778,7 @@ async def final_common_stub(callback: CallbackQuery):
         [InlineKeyboardButton(text="🎓 Прожить день магистранта", callback_data="start_day")]
     ])
     await callback.message.answer_photo(
-        photo="https://storage2.bothelp.io/pecherichenko/8e/8ed7/8ed7ee41fb372606bdfececd74eda094/IMG_4966.jpeg",
+        photo="https://storage2.bothelp.io/pecherichenko/8e/8ed7/8ed7ee41fb372606bdfceecd74eda094/IMG_4966.jpeg",
         caption="🎓 Ситуационный центр КубГУ завершает работу.\n\n"
                 "Вы прошли испытание и увидели лишь малую часть того, чему учат в магистратуре «Дипломатия: теория, история, практика» Кубанского государственного университета.\n\n"
                 "Руководитель программы — Кумпан Вадим Александрович, кандидат исторических наук, доцент кафедры всеобщей истории и международных отношений.\n\n"
@@ -759,6 +787,21 @@ async def final_common_stub(callback: CallbackQuery):
         reply_markup=keyboard
     )
     log_event(callback.from_user.id, callback.from_user.username or "unknown", "Прошёл трек до финала")
+
+    # === ВОПРОС О КОНТАКТЕ ===
+    user_id = callback.from_user.id
+    if not contact_provided.get(user_id, False):
+        contact_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="✍️ Оставить контакт", callback_data="ask_contact_track")]
+        ])
+        await callback.message.answer(
+            "✍️ Хотите получать информацию о поступлении?\n"
+            "Напишите ваш email или номер телефона.",
+            reply_markup=contact_keyboard
+        )
+    else:
+        await callback.message.answer("✅ Спасибо, мы уже получили ваш контакт!")
+
     await callback.answer()
 
 # ========== ТЕСТ ==========
@@ -1030,6 +1073,22 @@ async def handle_test(callback: CallbackQuery):
             parse_mode="Markdown"
         )
 
+        # === ВОПРОС О КОНТАКТЕ ===
+    user_id = callback.from_user.id
+    if not contact_provided.get(user_id, False):
+        contact_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="✍️ Оставить контакт", callback_data="ask_contact_test")]
+        ])
+        await callback.message.answer(
+            "✍️ Хотите получать информацию о поступлении?\n"
+            "Напишите ваш email или номер телефона.",
+            reply_markup=contact_keyboard
+        )
+    else:
+        await callback.message.answer("✅ Спасибо, мы уже получили ваш контакт!")
+    
+    await callback.answer()
+
     elif callback.data == "test_wrong7a":
         final_score = score
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
@@ -1051,6 +1110,22 @@ async def handle_test(callback: CallbackQuery):
             parse_mode="Markdown"
         )
 
+    # === ВОПРОС О КОНТАКТЕ ===
+    user_id = callback.from_user.id
+    if not contact_provided.get(user_id, False):
+        contact_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="✍️ Оставить контакт", callback_data="ask_contact_test")]
+        ])
+        await callback.message.answer(
+            "✍️ Хотите получать информацию о поступлении?\n"
+            "Напишите ваш email или номер телефона.",
+            reply_markup=contact_keyboard
+        )
+    else:
+        await callback.message.answer("✅ Спасибо, мы уже получили ваш контакт!")
+    
+    await callback.answer()
+
     elif callback.data == "test_wrong7c":
         final_score = score
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
@@ -1071,6 +1146,22 @@ async def handle_test(callback: CallbackQuery):
             parse_mode="Markdown"
         )
 
+    # === ВОПРОС О КОНТАКТЕ ===
+    user_id = callback.from_user.id
+    if not contact_provided.get(user_id, False):
+        contact_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="✍️ Оставить контакт", callback_data="ask_contact_test")]
+        ])
+        await callback.message.answer(
+            "✍️ Хотите получать информацию о поступлении?\n"
+            "Напишите ваш email или номер телефона.",
+            reply_markup=contact_keyboard
+        )
+    else:
+        await callback.message.answer("✅ Спасибо, мы уже получили ваш контакт!")
+    
+    await callback.answer()
+
     elif callback.data == "test_wrong7d":
         final_score = score
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
@@ -1090,6 +1181,22 @@ async def handle_test(callback: CallbackQuery):
             reply_markup=keyboard,
             parse_mode="Markdown"
         )
+
+    # === ВОПРОС О КОНТАКТЕ ===
+    user_id = callback.from_user.id
+    if not contact_provided.get(user_id, False):
+        contact_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="✍️ Оставить контакт", callback_data="ask_contact_test")]
+        ])
+        await callback.message.answer(
+            "✍️ Хотите получать информацию о поступлении?\n"
+            "Напишите ваш email или номер телефона.",
+            reply_markup=contact_keyboard
+        )
+    else:
+        await callback.message.answer("✅ Спасибо, мы уже получили ваш контакт!")
+    
+    await callback.answer()
 
     # ===== СОХРАНЕНИЕ РЕЗУЛЬТАТА =====
     test_score[user_id] = {"score": score, "current": 1}
@@ -1215,6 +1322,21 @@ async def day_final(callback: CallbackQuery):
         reply_markup=keyboard,
         parse_mode="Markdown"
     )
+
+    # === ВОПРОС О КОНТАКТЕ ===
+    user_id = callback.from_user.id
+    if not contact_provided.get(user_id, False):
+        contact_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="✍️ Оставить контакт", callback_data="ask_contact_day")]
+        ])
+        await callback.message.answer(
+            "✍️ Хотите получать информацию о поступлении?\n"
+            "Напишите ваш email или номер телефона.",
+            reply_markup=contact_keyboard
+        )
+    else:
+        await callback.message.answer("✅ Спасибо, мы уже получили ваш контакт!")
+        
     await callback.answer()
 
 # ========== ОСНОВНАЯ ИНФОРМАЦИЯ О ПРОГРАММЕ (ПОЛНАЯ ВЕРСИЯ) ==========
@@ -1239,6 +1361,21 @@ async def info_main_menu(callback: CallbackQuery):
         parse_mode="Markdown"
     )
     log_event(callback.from_user.id, callback.from_user.username or "unknown", "Открыл информацию")
+
+    # === ВОПРОС О КОНТАКТЕ ===
+    user_id = callback.from_user.id
+    if not contact_provided.get(user_id, False):
+        contact_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="✍️ Оставить контакт", callback_data="ask_contact_info")]
+        ])
+        await callback.message.answer(
+            "✍️ Хотите получать информацию о поступлении?\n"
+            "Напишите ваш email или номер телефона.",
+            reply_markup=contact_keyboard
+        )
+    else:
+        await callback.message.answer("✅ Спасибо, мы уже получили ваш контакт!")
+        
     await callback.answer()
 
 @dp.callback_query(F.data == "info_goals")
@@ -1645,6 +1782,33 @@ async def back_to_protocol(callback: CallbackQuery):
     await callback.message.answer(
         "Выберите протокол связи. Как предпочитаете работать?",
         reply_markup=keyboard
+    )
+    await callback.answer()
+
+# ========== ОБРАБОТЧИКИ ДЛЯ КОНТАКТОВ ==========
+@dp.message(F.text)
+async def save_contact(message: Message):
+    user_id = message.from_user.id
+    username = message.from_user.username or "unknown"
+    contact = message.text.strip()
+    
+    if not contact:
+        await message.answer("Пожалуйста, напишите ваш контакт (email или телефон).")
+        return
+    
+    contact_provided[user_id] = True
+    log_contact(user_id, username, contact, "contact_provided")
+    
+    await message.answer(
+        "✅ Спасибо! Мы свяжемся с вами в ближайшее время.\n\n"
+        "Если у вас есть вопросы, вы всегда можете написать нам."
+    )
+
+@dp.callback_query(F.data.startswith("ask_contact_"))
+async def ask_contact(callback: CallbackQuery):
+    await callback.message.answer(
+        "✍️ Напишите ваш email или номер телефона.\n\n"
+        "Мы используем эти данные только для связи с вами."
     )
     await callback.answer()
 
