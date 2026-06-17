@@ -66,7 +66,7 @@ async def start(message: Message):
                 "⬇ Нажмите кнопку «Продолжить», чтобы получить первую вводную.",
         reply_markup=keyboard
     )
-    log_event(message.from_user.id, message.from_user.username or "unknown", "started")
+    log_event(message.from_user.id, message.from_user.username or "unknown", "Запустил бота")
 
 # ========== СБОР ИМЕНИ ==========
 @dp.callback_query(F.data == "continue_after_welcome")
@@ -97,7 +97,7 @@ async def choose_protocol(callback: CallbackQuery):
         "⬇ Нажмите на один из вариантов.",
         reply_markup=keyboard
     )
-    log_event(callback.from_user.id, callback.from_user.username or "unknown", "chose_protocol")
+    log_event(callback.from_user.id, callback.from_user.username or "unknown", "Выбрал протокол")
     await callback.answer()
 
 # ===================== ПРОТОКОЛ АНАЛИТИКА =====================
@@ -729,7 +729,7 @@ async def final_common_stub(callback: CallbackQuery):
                 "⬇ Выберите действие:",
         reply_markup=keyboard
     )
-    log_event(callback.from_user.id, callback.from_user.username or "unknown", "completed_track")
+    log_event(callback.from_user.id, callback.from_user.username or "unknown", "Прошёл трек до финала")
     await callback.answer()
 
 # ========== ТЕСТ ==========
@@ -749,7 +749,7 @@ async def start_test(callback: CallbackQuery):
         ]),
         parse_mode="Markdown"
     )
-    log_event(callback.from_user.id, callback.from_user.username or "unknown", "started_test")
+    log_event(callback.from_user.id, callback.from_user.username or "unknown", "Начал тест")
     await callback.answer()
 
 @dp.callback_query(F.data.startswith("test_"))
@@ -984,7 +984,7 @@ async def handle_test(callback: CallbackQuery):
             [InlineKeyboardButton(text="🔄 Пройти тест заново", callback_data="start_test")],
             [InlineKeyboardButton(text="🎓 Прожить день магистранта", callback_data="start_day")]
         ])
-        log_event(callback.from_user.id, callback.from_user.username or "unknown", "completed_test", result=f"{final_score} из 7", score=final_score)
+        log_event(callback.from_user.id, callback.from_user.username or "unknown", "Завершил тест", result=f"{final_score} из 7", score=final_score)
         await callback.message.answer_photo(
             photo="https://storage2.bothelp.io/pecherichenko/a2/a2f1/a2f1eb3120c4158fe8cb11bb44b99e07/IMG_5030.jpeg",
             caption=f"✅ **Верно!**\n\nХартленд — это сердцевинная земля Евразии. Маккиндер считал: кто контролирует Восточную Европу — командует хартлендом, кто командует хартлендом — командует Мировым островом, кто командует Мировым островом — командует миром. На курсе «Международные отношения в XX–XXI вв. в контексте геополитических концепций» (профессор Ратушняк О.В.) вы разберёте эту теорию и её влияние на мировую политику.\n\n"
@@ -1010,7 +1010,7 @@ async def handle_test(callback: CallbackQuery):
             [InlineKeyboardButton(text="🔄 Пройти тест заново", callback_data="start_test")],
             [InlineKeyboardButton(text="🎓 Прожить день магистранта", callback_data="start_day")]
         ])
-        log_event(callback.from_user.id, callback.from_user.username or "unknown", "completed_test", result=f"{final_score} из 7", score=final_score)
+        log_event(callback.from_user.id, callback.from_user.username or "unknown", "Завершил тест", result=f"{final_score} из 7", score=final_score)
         await callback.message.answer_photo(
             photo="https://storage2.bothelp.io/pecherichenko/a2/a2f1/a2f1eb3120c4158fe8cb11bb44b99e07/IMG_5030.jpeg",
             caption=f"❌ **Неверно.**\n\nЭто концепция «морской силы» адмирала Мэхэна. Он считал, что господство на море — ключ к мировому влиянию. А хартленд — это противоположная теория: Маккиндер утверждал, что решает контроль над сухопутным центром Евразии. Две конкурирующие концепции, которые вы разберёте в магистратуре КубГУ.\n\n"
@@ -1031,7 +1031,7 @@ async def handle_test(callback: CallbackQuery):
             [InlineKeyboardButton(text="🔄 Пройти тест заново", callback_data="start_test")],
             [InlineKeyboardButton(text="🎓 Прожить день магистранта", callback_data="start_day")]
         ])
-        log_event(callback.from_user.id, callback.from_user.username or "unknown", "completed_test", result=f"{final_score} из 7", score=final_score)
+        log_event(callback.from_user.id, callback.from_user.username or "unknown", "Завершил тест", result=f"{final_score} из 7", score=final_score)
         await callback.message.answer_photo(
             photo="https://storage2.bothelp.io/pecherichenko/a2/a2f1/a2f1eb3120c4158fe8cb11bb44b99e07/IMG_5030.jpeg",
             caption=f"❌ **Неверно.**\n\nЭто ближе к теории демократического мира или концепции «распространения демократии». Хартленд — совсем другое. Это географический детерминизм: рельеф и расположение определяют силу государства. Центр Евразии неуязвим для морских держав — вот в чём суть.\n\n"
@@ -1051,7 +1051,7 @@ async def handle_test(callback: CallbackQuery):
             [InlineKeyboardButton(text="🔄 Пройти тест заново", callback_data="start_test")],
             [InlineKeyboardButton(text="🎓 Прожить день магистранта", callback_data="start_day")]
         ])
-        log_event(callback.from_user.id, callback.from_user.username or "unknown", "completed_test", result=f"{final_score} из 7", score=final_score)
+        log_event(callback.from_user.id, callback.from_user.username or "unknown", "Завершил тест", result=f"{final_score} из 7", score=final_score)
         await callback.message.answer_photo(
             photo="https://storage2.bothelp.io/pecherichenko/a2/a2f1/a2f1eb3120c4158fe8cb11bb44b99e07/IMG_5030.jpeg",
             caption=f"❌ **Неверно.**\n\nЭто концепция Сэмюэля Хантингтона — «Столкновение цивилизаций». Она появилась в 1990-е годы. А хартленд — это классическая геополитика начала XX века. Маккиндер смотрел на карту и видел: огромная территория в центре Евразии недоступна для флота — и в этом ключ к мировому господству.\n\n"
@@ -1081,7 +1081,7 @@ async def start_day(callback: CallbackQuery):
         reply_markup=keyboard,
         parse_mode="Markdown"
     )
-    log_event(callback.from_user.id, callback.from_user.username or "unknown", "started_day")
+    log_event(callback.from_user.id, callback.from_user.username or "unknown", "Начал день магистранта")
     await callback.answer()
 
 @dp.callback_query(F.data == "day_early")
@@ -1209,7 +1209,7 @@ async def info_main_menu(callback: CallbackQuery):
         reply_markup=keyboard,
         parse_mode="Markdown"
     )
-    log_event(callback.from_user.id, callback.from_user.username or "unknown", "reached_info")
+    log_event(callback.from_user.id, callback.from_user.username or "unknown", "Открыл информацию")
     await callback.answer()
 
 @dp.callback_query(F.data == "info_goals")
