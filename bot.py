@@ -835,19 +835,25 @@ async def handle_test(callback: CallbackQuery):
         score += 1
         await callback.message.answer(
             "✅ **Верно!**\n\nКультурный обмен — классический пример «мягкой силы». Термин ввёл Джозеф Най. На курсе «Публичная дипломатия: теория и практика» (доцент Безрученко М.П.) вы изучите это глубже.\n\n▶ Нажмите «Дальше»",
-            reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next2")]]),
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text="▶ Дальше", callback_data="test_next2")]
+            ]),
             parse_mode="Markdown"
         )
     elif callback.data == "test_wrong1a":
         await callback.message.answer(
             "❌ **Неверно.**\n\nВоенное присутствие — это классический инструмент «жёсткой силы». Она опирается на принуждение и страх. Мягкая сила, напротив, работает через привлекательность культуры, ценностей и политических институтов. Именно её изучают на курсе «Публичная дипломатия» в магистратуре КубГУ.\n\n▶ Нажмите «Дальше»",
-            reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next2")]]),
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text="▶ Дальше", callback_data="test_next2")]
+            ]),
             parse_mode="Markdown"
         )
     elif callback.data == "test_wrong1b":
         await callback.message.answer(
             "❌ **Неверно.**\n\nЭкономические санкции — это тоже «жёсткая сила». Они заставляют, а не привлекают. Мягкая сила — это когда другие страны сами хотят с вами сотрудничать, потому что разделяют ваши ценности и восхищаются вашей культурой.\n\n▶ Нажмите «Дальше»",
-            reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="▶ Дальше", callback_data="test_next2")]]),
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text="▶ Дальше", callback_data="test_next2")]
+            ]),
             parse_mode="Markdown"
         )
 
