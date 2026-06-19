@@ -1759,9 +1759,20 @@ async def save_contact(message: Message):
     contact_provided[user_id] = True
     log_contact(user_id, username, contact, "contact_provided")
     
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="💼 Основная информация о программе", callback_data="info_placeholder")],
+        [InlineKeyboardButton(text="👨‍🏫 Задать вопрос о поступлении", callback_data="contacts_placeholder")],
+        [InlineKeyboardButton(text="🔄 Вернуться к симуляции", callback_data="choose_protocol")],
+        [InlineKeyboardButton(text="🎓 Прожить день магистранта", callback_data="start_day")],
+        [InlineKeyboardButton(text="📝 Пройти пробный тест", callback_data="start_test")]
+    ])
+    
     await message.answer(
-        "✅ Спасибо! Мы свяжемся с вами в ближайшее время.\n\n"
-        "Если у вас есть вопросы, вы всегда можете написать нам."
+        "✅ **Спасибо! Мы свяжемся с вами в ближайшее время.**\n\n"
+        "Если у вас есть вопросы, вы всегда можете написать нам.\n\n"
+        "А пока вы можете продолжить знакомство с магистратурой:",
+        reply_markup=keyboard,
+        parse_mode="Markdown"
     )
 
 @dp.callback_query(F.data.startswith("ask_contact_"))
